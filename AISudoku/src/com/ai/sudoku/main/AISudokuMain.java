@@ -1,4 +1,4 @@
-package com.ai.sudoku;
+package com.ai.sudoku.main;
 
 import java.io.File;
 import java.util.Scanner;
@@ -17,7 +17,7 @@ public class AISudokuMain {
 			int boxQtyX = scanner.nextInt();
 			int boxQtyY = scanner.nextInt();
 			scanner.nextLine();
-			SudokuBoard board = boardBuilder.build(scanner, size, boxQtyX, boxQtyY);
+			SudokuBoard board = boardBuilder.buildBoard(scanner, size, boxQtyX, boxQtyY);
 			SudokuAIHandler sudoku = new SudokuAIHandler(board);
 			sudoku.runArcConsistancy();
 			sudoku.runGeneticAlgorithm();

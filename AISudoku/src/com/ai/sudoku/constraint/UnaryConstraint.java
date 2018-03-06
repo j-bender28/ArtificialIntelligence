@@ -23,7 +23,7 @@ public abstract class UnaryConstraint extends Constraint {
 		return unFunc.apply(cell);
 	}
 	
-	public Set<@NonNull Square> getCells() {
+	public Set<@NonNull Square> getSquares() {
 		return Sets.newHashSet(cell);
 	}
 }

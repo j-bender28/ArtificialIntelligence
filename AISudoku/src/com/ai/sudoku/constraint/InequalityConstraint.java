@@ -6,7 +6,7 @@ import com.ai.sudoku.board.Square;
 
 public class InequalityConstraint extends BinaryConstraint {
 
-	public InequalityConstraint(@NonNull Square cellA, @NonNull Square cellB) {
-		super(cellA, cellB, (c1, c2) -> c1.invokeInequalityConstraint(c2));
+	public InequalityConstraint(@NonNull Square sqareA, @NonNull Square sqareB) {
+		super(sqareA, sqareB, (sA, sB) -> sA.invokeInequalityConstraint(sB));
 	}
 }

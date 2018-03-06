@@ -8,7 +8,7 @@ import com.ai.sudoku.board.Square;
 
 public abstract class Constraint {
 	
-	public abstract Set<@NonNull Square> getCells();
+	public abstract Set<@NonNull Square> getSquares();
 	public abstract boolean invoke();
 	public abstract boolean equals(Object obj);
 	public abstract int hashCode();

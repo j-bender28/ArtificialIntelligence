@@ -3,38 +3,28 @@ package com.ai.sudoku.board;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.ai.sudoku.constraint.InequalityConstraint;
 import com.google.common.collect.Lists;
 
 public class SudokuBoard {
 
-	private List<Collection<@NonNull Square>> rows;
-	private List<Collection<@NonNull Square>> cols;
-	private List<Collection<@NonNull Square>> boxes;
-	private int size;
+	private Collection<Collection<@NonNull Square>> rows;
+	private List<@NonNull InequalityConstraint> constraints;
 
-	public SudokuBoard(Collection<Collection<@NonNull Square>> rows, 
-			Collection<Collection<@NonNull Square>> cols,
-			Collection<Collection<@NonNull Square>> boxes, 
-			int size) {
-		this.rows = Lists.newArrayList(rows);
-		this.cols = Lists.newArrayList(cols);
-		this.boxes = Lists.newArrayList(boxes);
-		this.size = size;
+	public SudokuBoard(Collection<Collection<@NonNull Square>> rows, List<@NonNull InequalityConstraint> constraints) {
+		this.rows = rows;
+		this.constraints = constraints;
 	}
 
-	public List<Collection<@NonNull Square>> getAllGroups() {
-		return Stream.of(rows, cols, boxes)
-			.flatMap(Collection::stream)
-			.collect(Collectors.toList());
+	public List<@NonNull InequalityConstraint> getConstraints() {
+		return constraints;
 	}
 
-	public int getSize() {
-		return size;
+	public List<Collection<@NonNull Square>> getRows() {
+		return Lists.newArrayList(rows);
 	}
 
 	public void print() {
@@ -49,5 +39,5 @@ public class SudokuBoard {
 			}
 			System.out.println();
 		}
-	}	
+	}
 }

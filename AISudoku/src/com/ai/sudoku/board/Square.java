@@ -6,7 +6,7 @@ import java.util.Set;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.ai.sudoku.constraint.Constraint;
+import com.ai.sudoku.constraint.BinaryConstraint;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -14,8 +14,13 @@ public final class Square {
 	
 	private Optional<Integer> value = Optional.empty();
 	private List<Integer> possibilities = Lists.newArrayList();
-	private Set<@NonNull Constraint> constraints = Sets.newHashSet();
+	private Set<@NonNull BinaryConstraint> constraints = Sets.newHashSet();
 
+	Square(Square square) {
+		this.value = square.value;
+		this.possibilities = Lists.newArrayList(square.possibilities);
+	}
+	
 	Square(List<Integer> possibilities) {
 		this.possibilities = possibilities;
 	}
@@ -24,7 +29,7 @@ public final class Square {
 		this.value = Optional.of(value);
 	}
 	
-	public void addConstraint(@NonNull Constraint constraint) {
+	public void addConstraint(@NonNull BinaryConstraint constraint) {
 		constraints.add(constraint);
 	}
 
