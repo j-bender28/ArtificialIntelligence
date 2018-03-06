@@ -3,6 +3,10 @@ package com.ai.sudoku;
 import java.io.File;
 import java.util.Scanner;
 
+import com.ai.sudoku.analysis.SudokuAIHandler;
+import com.ai.sudoku.board.SudokuBoard;
+import com.ai.sudoku.board.SudokuBoardBuilder;
+
 public class AISudokuMain {
 
 	public static void main(String[] args) throws Exception {
@@ -17,7 +21,6 @@ public class AISudokuMain {
 			SudokuAIHandler sudoku = new SudokuAIHandler(board);
 			sudoku.runArcConsistancy();
 			sudoku.runGeneticAlgorithm();
-			sudoku.runArcConsistancy();
 		}
 	}
 }
