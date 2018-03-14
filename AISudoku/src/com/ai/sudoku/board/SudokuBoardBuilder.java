@@ -2,43 +2,23 @@ package com.ai.sudoku.board;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 
-import com.ai.sudoku.constraint.InequalityConstraint;
+import com.ai.sudoku.exception.InvalidBoardException;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 public class SudokuBoardBuilder {
-	
-	public SudokuBoard copyBoard(@NonNull SudokuBoard board) {
-		Map<Square, @NonNull Square> squareMapping = Maps.newHashMap();
-		ArrayListMultimap<Integer, @NonNull Square> rows = ArrayListMultimap.create();
-		int rowInd = 0;
-		for (Collection<@NonNull Square> row : board.getRows()) {
-			for (Square square : row) {
-				Square clonedSquare = new Square(square);
-				squareMapping.put(square, clonedSquare);
-				rows.put(rowInd, clonedSquare);
-			}
-			rowInd++;
-		}
-		List<@NonNull InequalityConstraint> constraints = Lists.newArrayList();
-		for(InequalityConstraint constraint : board.getConstraints()) {
-			@NonNull Square squareA = squareMapping.get(constraint.getSquareA());
-			@NonNull Square squareB = squareMapping.get(constraint.getSquareB());
-			constraints.add(new InequalityConstraint(squareA, squareB));
-		}
-		return new SudokuBoard(rows.asMap().values(), constraints);
-	}
 
-	public SudokuBoard buildBoard(Scanner scanner, int size, int rowsPerBox, int colsPerBox) throws IOException {
+	public SudokuBoard buildBoard(Scanner scanner, int size, int rowsPerBox, int colsPerBox) throws IOException, InvalidBoardException {
 		ArrayListMultimap<Integer, @NonNull Square> rows = ArrayListMultimap.create(size, size);
 		ArrayListMultimap<Integer, @NonNull Square> cols = ArrayListMultimap.create(size, size);
 		ArrayListMultimap<Integer, @NonNull Square> boxes = ArrayListMultimap.create(size, size);
@@ -48,21 +28,35 @@ public class SudokuBoardBuilder {
 			int colInd = cellIndex % size;
 			int box = (rowInd / rowsPerBox) * rowsPerBox + colInd / colsPerBox;
 			int val = scanner.nextInt();		
-			Square cell;
+			Square square;
 			if (val > 0 && val <= size) {
-				cell = new Square(val);
+				square = new Square(rowInd, colInd, val);
 			} else {
-				cell = new Square(createPossibilities(size));
+				square = new Square(rowInd, colInd, createPossibilities(size));
 			}
-			rows.put(rowInd, cell);
-			cols.put(colInd, cell);
-			boxes.put(box, cell);
+			rows.put(rowInd, square);
+			cols.put(colInd, square);
+			boxes.put(box, square);
 			cellIndex++;
 		}
 		List<Collection<@NonNull Square>> rowList = list(rows.asMap().values());
 		List<Collection<@NonNull Square>> allGroups = list(rowList, cols.asMap().values(), boxes.asMap().values());
-		List<@NonNull InequalityConstraint> constraints = extractConstraints(allGroups);
+		ensureValidInputBoard(allGroups, size);
+		List<Constraint> constraints = extractConstraints(allGroups);
 		return new SudokuBoard(rowList, constraints);
+	}
+
+	private void ensureValidInputBoard(List<Collection<@NonNull Square>> allGroups, int size) throws InvalidBoardException {
+		for (Collection<@NonNull Square> group : allGroups) {
+			List<Integer> allVals = group.stream()
+					.map(square -> square.getValue())
+					.filter(Optional::isPresent)
+					.map(Optional::get)
+					.collect(Collectors.toList());
+			if (allVals.size() != Sets.newHashSet(allVals).size()) {
+				throw new InvalidBoardException();
+			}
+		}
 	}
 
 	private <T> List<Collection<@NonNull T>> list(Collection<Collection<@NonNull T>> ...values) {
@@ -71,18 +65,23 @@ public class SudokuBoardBuilder {
 				.collect(Collectors.toList());
 	}
 
-	private List<@NonNull InequalityConstraint> extractConstraints(List<Collection<@NonNull Square>> allGroups) {
-		List<@NonNull InequalityConstraint> constraints = Lists.newArrayList();
+	private List<Constraint> extractConstraints(List<Collection<@NonNull Square>> allGroups) {
+		LinkedHashSet<Constraint> constraints = Sets.newLinkedHashSet();
 		for (Collection<@NonNull Square> cellGroup : allGroups) {
-			for (Square cellA : Lists.newArrayList(cellGroup)) {
+			for (Square cellA : cellGroup) {
 				for (Square cellB : cellGroup) {
 					if (!cellA.equals(cellB)) {
-						constraints.add(new InequalityConstraint(cellA, cellB));
+						Constraint constraint = new InequalityConstraint(cellA, cellB);
+						if (constraints.add(constraint)) {
+							cellA.addConstraint(constraint);
+							cellB.addConstraint(constraint);
+						}
 					}
 				}
 			}
 		}
-		return constraints;
+//		allGroups.forEach(group -> constraints.add(new SinglePossibilityConstraint(group)));
+		return Lists.newArrayList(constraints);
 	}
 
 	private List<Integer> createPossibilities(int size) {

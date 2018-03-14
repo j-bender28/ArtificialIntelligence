@@ -1,6 +1,7 @@
 package com.ai.sudoku.analysis;
 
 import com.ai.sudoku.board.SudokuBoard;
+import com.ai.sudoku.exception.InvalidBoardException;
 
 public class SudokuAIHandler {
 
@@ -10,11 +11,10 @@ public class SudokuAIHandler {
 		this.board = board;
 	}
 
-	public void runArcConsistancy() {
+	public void runArcConsistancy() throws InvalidBoardException {
 		System.out.println("Started Arc Consistency Analysis");
 		ArcConsistancyAnalyzer analyzer = new ArcConsistancyAnalyzer(board);
 		analyzer.run();
-		board.print();
 		System.out.println("Completed Arc Consistency Analysis");
 	}
 
