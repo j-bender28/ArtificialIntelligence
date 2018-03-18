@@ -13,7 +13,7 @@ public class SudokuAIHandler {
 
 	public void runArcConsistancy() throws InvalidBoardException {
 		System.out.println("Started Arc Consistency Analysis");
-		ArcConsistancyAnalyzer analyzer = new ArcConsistancyAnalyzer(board);
+		ArcConsistancy analyzer = new ArcConsistancy(board);
 		analyzer.run();
 		System.out.println("Completed Arc Consistency Analysis");
 	}

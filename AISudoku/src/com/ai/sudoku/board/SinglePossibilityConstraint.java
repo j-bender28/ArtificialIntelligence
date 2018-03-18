@@ -41,7 +41,7 @@ public class SinglePossibilityConstraint extends Constraint {
 	public String toString() {
 		StringBuilder builder = new StringBuilder("Constraint between");
 		for (Square square : squares) {
-			builder.append(String.format(" Square[%s,%s]", square.getRow(), square.getCol()));
+			builder.append(String.format(" Square%s", square.getLocation()));
 		}
 		return builder.toString();
 	}

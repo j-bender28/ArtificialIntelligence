@@ -14,32 +14,30 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.transformation.FilteredList;
 
-public final class Square {
+public class Square {
 	
-	private int row;
-	private int col;
+	private BoardLocation loc;
 	private Optional<Integer> value = Optional.empty();
 	private Optional<Integer> bestGuest = Optional.empty();
 	private FilteredList<Integer> possibilities = new FilteredList<Integer>(FXCollections.observableArrayList());
 	private List<Constraint> constraints = Lists.newArrayList();
 
-	Square(int row, int col, int value) {
-		this(row, col, Lists.newArrayList());
+	protected Square(BoardLocation boardLoc, int value) {
+		this(boardLoc, Lists.newArrayList());
 		this.value = Optional.of(value);
 		this.bestGuest = this.value;
 	}
 	
-	Square(int row, int col, List<Integer> possibilities) {
-		this.row = row;
-		this.col = col;
+	Square(BoardLocation boardLoc, List<Integer> possibilities) {
+		this.loc = boardLoc;
 		List<Integer> sourcePoss = (List<Integer>) this.possibilities.getSource();
 		possibilities.forEach(sourcePoss::add);
 		this.possibilities.addListener((ListChangeListener<Integer>) lcl -> {
 			constraints.forEach(c -> c.setSatisfied(false));
 		});
 	}
-	
-	void addConstraint(@NonNull Constraint constraint) {
+
+	protected void addConstraint(@NonNull Constraint constraint) {
 		constraints.add(constraint);
 	}
 	
@@ -126,16 +124,16 @@ public final class Square {
 		}
 	}
 
-	public int getRow() {
-		return row;
-	}
-
-	public int getCol() {
-		return col;
+	public BoardLocation getLocation() {
+		return loc;
 	}
 	
 	@Override
 	public String toString() {
-		return String.format("Square[%s,%s] >> Value: %s", row, col, value);
+		return String.format("Square[%s,%s] >> Value: %s", loc.getRowIndex(), loc.getColIndex(), value);
+	}
+
+	public List<Constraint> getConstaints() {
+		return constraints;
 	}
 }

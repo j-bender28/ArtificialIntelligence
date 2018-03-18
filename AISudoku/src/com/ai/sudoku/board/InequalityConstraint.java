@@ -27,8 +27,7 @@ public class InequalityConstraint extends Constraint {
 	
 	@Override
 	public String toString() {
-		return String.format("Constraint between Square[%s,%s] and Square[%s,%s]", squareA.getRow(), squareA.getCol(),
-				squareB.getRow(), squareB.getCol());
+		return String.format("Constraint between Square%s and Square%s", squareA.getLocation(), squareB.getLocation());
 	}
 
 	@Override

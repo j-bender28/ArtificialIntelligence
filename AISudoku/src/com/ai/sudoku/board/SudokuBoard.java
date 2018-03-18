@@ -2,6 +2,7 @@ package com.ai.sudoku.board;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -9,10 +10,10 @@ import com.google.common.collect.Lists;
 
 public class SudokuBoard {
 
-	private Collection<Collection<@NonNull Square>> rows;
+	private Cluster[] rows;
 	private List<Constraint> constraints;
 
-	public SudokuBoard(Collection<Collection<@NonNull Square>> rows, List<Constraint> constraints) {
+	public SudokuBoard(Cluster[] rows, List<Constraint> constraints) {
 		this.rows = rows;
 		this.constraints = constraints;
 	}
@@ -21,17 +22,17 @@ public class SudokuBoard {
 		return constraints;
 	}
 
-	public List<Collection<@NonNull Square>> getRows() {
+	public List<Cluster> getRows() {
 		return Lists.newArrayList(rows);
 	}
 
 	public void resetGuesses() {
-		rows.stream().flatMap(row -> row.stream()).forEach(Square::resetGuess);
+		Stream.of(rows).flatMap(row -> row.stream()).forEach(Square::resetGuess);
 		constraints.forEach(c -> c.setSatisfied(false));		
 	}
 	
 	public boolean isSolved() {
-		for (Collection<@NonNull Square> row : rows) {
+		for (Cluster row : rows) {
 			for (Square cell : row) {
 				if (!cell.getValue().isPresent()) {
 					return false;
@@ -55,5 +56,9 @@ public class SudokuBoard {
 
 	public boolean containsUnsatisfiedConstraints() {
 		return !constraints.stream().allMatch(Constraint::isSatisfied);
+	}
+
+	public int getDomain() {
+		return rows.length;
 	}
 }

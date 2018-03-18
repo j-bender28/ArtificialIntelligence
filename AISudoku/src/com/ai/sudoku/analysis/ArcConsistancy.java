@@ -11,12 +11,12 @@ import com.ai.sudoku.board.SudokuBoard;
 import com.ai.sudoku.exception.InvalidBoardException;
 import com.google.common.collect.Lists;
 
-public class ArcConsistancyAnalyzer {
+public class ArcConsistancy {
 
 	private SudokuBoard board;
 	private List<Constraint> constraints;
 
-	public ArcConsistancyAnalyzer(SudokuBoard board) {
+	public ArcConsistancy(SudokuBoard board) {
 		this.board = board;
 		this.constraints = board.getConstraints();
 	}
@@ -36,8 +36,7 @@ public class ArcConsistancyAnalyzer {
 	}
 
 	private void guessValue(Square square, int guessVal) throws InvalidBoardException {
-		System.out.println(String.format("Guessing: %s, Row: %s, Col: %s", guessVal, square.getRow(),
-				square.getCol()));
+		System.out.println(String.format("Guessing: %s, Row: %s, Col: %s", guessVal, square.getLocation()));
 		square.setBestGuess(guessVal);
 		try {
 			maintainArcConsistancy(true);			
