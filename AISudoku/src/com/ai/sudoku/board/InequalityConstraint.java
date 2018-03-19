@@ -27,11 +27,17 @@ public class InequalityConstraint extends Constraint {
 	
 	@Override
 	public String toString() {
-		return String.format("Constraint between Square%s and Square%s", squareA.getLocation(), squareB.getLocation());
+		return String.format("Constraint between Square%s and Square%s, Satisfied = %s", squareA.getLocation(),
+				squareB.getLocation(), isSatisfied());
 	}
 
 	@Override
 	public boolean invoke(boolean isGuess) throws InvalidBoardException {
 		return squareA.invokeInequalityConstraints(squareB, isGuess);
+	}
+
+	@Override
+	public boolean isViolated() {
+		return squareA.getBestGuess().equals(squareB.getBestGuess());
 	}
 }

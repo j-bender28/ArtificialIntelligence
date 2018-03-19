@@ -18,14 +18,14 @@ public class Square {
 	
 	private BoardLocation loc;
 	private Optional<Integer> value = Optional.empty();
-	private Optional<Integer> bestGuest = Optional.empty();
+	private Optional<Integer> bestGuess = Optional.empty();
 	private FilteredList<Integer> possibilities = new FilteredList<Integer>(FXCollections.observableArrayList());
 	private List<Constraint> constraints = Lists.newArrayList();
 
 	protected Square(BoardLocation boardLoc, int value) {
 		this(boardLoc, Lists.newArrayList());
 		this.value = Optional.of(value);
-		this.bestGuest = this.value;
+		this.bestGuess = this.value;
 	}
 	
 	Square(BoardLocation boardLoc, List<Integer> possibilities) {
@@ -42,13 +42,13 @@ public class Square {
 	}
 	
 	public void setBestGuess(int guess) {
-		this.bestGuest = Optional.of(guess);
-		resetFilter();
+		this.bestGuess = Optional.of(guess);
+		possibilities.predicateProperty().set(val -> false);
 	}
 
 	public void setValue(Integer value) {
 		this.value = Optional.of(value);
-		resetFilter();
+		this.bestGuess = this.value;
 		possibilities.getSource().clear();
 	}
 
@@ -91,8 +91,8 @@ public class Square {
 		Optional<Integer> valA;
 		Optional<Integer> valB;
 		if (isGuess) {
-			valA = bestGuest;
-			valB = other.bestGuest;
+			valA = bestGuess;
+			valB = other.bestGuess;
 		} else {
 			valA = value;
 			valB = other.value;
@@ -102,7 +102,7 @@ public class Square {
 	}
 
 	public void resetGuess() {
-		bestGuest = Optional.empty();
+		bestGuess = Optional.empty();
 		resetFilter();
 	}
 	
@@ -111,11 +111,11 @@ public class Square {
 	}
 
 	public void print() {
-		if (value.isPresent()) {
-			System.out.print(String.format("   %s  ", value.get()));
+		if (bestGuess.isPresent()) {
+			System.out.print(String.format("   %s  ", bestGuess.get()));
 		} else {
 			for (int i = 0; i < 6; i++) {
-				if (possibilities.getSource().contains(i + 1)) {
+				if (possibilities.contains(i + 1)) {
 					System.out.print(i + 1);
 				} else {
 					System.out.print("-");
@@ -130,10 +130,14 @@ public class Square {
 	
 	@Override
 	public String toString() {
-		return String.format("Square[%s,%s] >> Value: %s", loc.getRowIndex(), loc.getColIndex(), value);
+		return String.format("Square[%s,%s] >> Value: %s", loc.getRowIndex(), loc.getColIndex(), bestGuess);
 	}
 
-	public List<Constraint> getConstaints() {
+	public List<Constraint> getConstraints() {
 		return constraints;
+	}
+
+	public Optional<Integer> getBestGuess() {
+		return bestGuess;
 	}
 }

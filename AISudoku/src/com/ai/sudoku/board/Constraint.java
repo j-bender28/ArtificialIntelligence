@@ -7,6 +7,7 @@ import com.ai.sudoku.exception.InvalidBoardException;
 public abstract class Constraint {
 
 	public abstract boolean invoke(boolean isGuess) throws InvalidBoardException;
+	public abstract boolean isViolated();
 	private boolean satisfied;
 	protected @NonNull Square[] squares;
 	
