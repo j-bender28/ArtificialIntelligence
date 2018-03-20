@@ -36,7 +36,7 @@ public class ArcConsistancy {
 	}
 
 	private void guessValue(Square square, int guessVal) throws InvalidBoardException {
-		System.out.println(String.format("Guessing: %s, Row: %s, Col: %s", guessVal, square.getLocation()));
+		System.out.println(String.format("Guessing: %s, %s", guessVal, square));
 		square.setBestGuess(guessVal);
 		try {
 			maintainArcConsistancy(true);			

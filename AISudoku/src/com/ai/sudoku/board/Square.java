@@ -21,15 +21,16 @@ public class Square {
 	private Optional<Integer> bestGuess = Optional.empty();
 	private FilteredList<Integer> possibilities = new FilteredList<Integer>(FXCollections.observableArrayList());
 	private List<Constraint> constraints = Lists.newArrayList();
+	private int domain;
 
-	protected Square(BoardLocation boardLoc, int value) {
-		this(boardLoc, Lists.newArrayList());
-		this.value = Optional.of(value);
-		this.bestGuess = this.value;
+	Square(BoardLocation boardLoc, int value, int domain) {
+		this(boardLoc, Lists.newArrayList(), domain);
+		setValue(value);
 	}
 	
-	Square(BoardLocation boardLoc, List<Integer> possibilities) {
+	Square(BoardLocation boardLoc, List<Integer> possibilities, int domain) {
 		this.loc = boardLoc;
+		this.domain = domain;
 		List<Integer> sourcePoss = (List<Integer>) this.possibilities.getSource();
 		possibilities.forEach(sourcePoss::add);
 		this.possibilities.addListener((ListChangeListener<Integer>) lcl -> {
@@ -102,8 +103,10 @@ public class Square {
 	}
 
 	public void resetGuess() {
-		bestGuess = Optional.empty();
-		resetFilter();
+		if (!value.isPresent()) {
+			bestGuess = Optional.empty();
+			resetFilter();
+		}
 	}
 	
 	private void resetFilter() {
@@ -114,7 +117,7 @@ public class Square {
 		if (bestGuess.isPresent()) {
 			System.out.print(String.format("   %s  ", bestGuess.get()));
 		} else {
-			for (int i = 0; i < 6; i++) {
+			for (int i = 0; i < domain; i++) {
 				if (possibilities.contains(i + 1)) {
 					System.out.print(i + 1);
 				} else {

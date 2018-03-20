@@ -6,9 +6,9 @@ import java.util.stream.Collectors;
 
 import org.eclipse.jdt.annotation.NonNull;
 
+import com.ai.sudoku.board.Constraint;
 import com.ai.sudoku.board.Square;
 import com.ai.sudoku.board.SudokuBoard;
-import com.google.common.collect.Lists;
 
 public class BacktrackingSearch {
 
@@ -19,40 +19,30 @@ public class BacktrackingSearch {
 	}
 
 	public void run() {
-		TreeNode root = createBacktrackingTree();
-		searchTreeForSolution(root);
+		List<@NonNull Square> squares = board.getRows().stream().flatMap(List::stream).collect(Collectors.toList());
+		searchTreeForSolution(0, squares);
 		board.print();
 	}
 
-	private void searchTreeForSolution(TreeNode parent) {
-		for (TreeNode child : parent.getChildren()) {
-			board.getConstraints().forEach(c -> c.setSatisfied(true));
-			if (child.guessDoesNotViolateConstraints()) {
-				board.print();
-				searchTreeForSolution(child);
-			} else {
-				child.revertGuess();
-			}
-		}
-	}
-
-	private TreeNode createBacktrackingTree() {
-		TreeNode rootNode = new TreeNode(0, null);
-		List<@NonNull Square> unconsumedSquares = board.getRows().stream().flatMap(List::stream).collect(Collectors.toList());
-		setupChildNodes(rootNode, unconsumedSquares, true);
-		return rootNode;
-	}
-
-	private void setupChildNodes(TreeNode currentNode, List<@NonNull Square> unconsumedSquares, boolean isFirstRun) {
-		if (!unconsumedSquares.isEmpty()) {
-			Square square = unconsumedSquares.remove(0);
+	private boolean searchTreeForSolution(int squareIndex, List<@NonNull Square> squares) {
+		if (squareIndex < squares.size()) {
+			squares.subList(squareIndex, squares.size()).forEach(Square::resetGuess);
+			Square square = squares.get(squareIndex);
 			Optional<Integer> value = square.getValue();
 			for (int guess = 1; guess <= board.getDomain(); guess++) {
 				if (value.isPresent() && value.get() != guess) continue; //Don't make branch when square's domain is known
-				TreeNode child = new TreeNode(guess, square);
-				currentNode.addChild(child);
-				setupChildNodes(child, Lists.newArrayList(unconsumedSquares), false);
+				System.out.println(String.format("Guessing: %s, %s", guess, square));
+				square.setBestGuess(guess);
+				board.getConstraints().forEach(c -> c.setSatisfied(true));				
+				if (square.getConstraints().stream().noneMatch(Constraint::isViolated)) {
+					board.print();
+					if (searchTreeForSolution(squareIndex + 1, squares)) {
+						return true;
+					}
+				}
+				square.resetGuess();
 			}
 		}
+		return board.isSolved();
 	}
 }

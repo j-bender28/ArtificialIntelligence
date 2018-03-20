@@ -1,6 +1,5 @@
 package com.ai.sudoku.board;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,9 +37,9 @@ public class SudokuBoardBuilder {
 			BoardLocation boardLoc = new BoardLocation(rowInd, colInd);
 			Square square;
 			if (val > 0 && val <= size) {
-				square = new Square(boardLoc, val);
+				square = new Square(boardLoc, val, size);
 			} else {
-				square = new Square(boardLoc, createPossibilities(size));
+				square = new Square(boardLoc, createPossibilities(size), size);
 			}
 			rows[rowInd].add(square);
 			cols[colInd].add(square);
@@ -73,19 +72,18 @@ public class SudokuBoardBuilder {
 	private List<Constraint> extractConstraints(List<Cluster> allClusters) {
 		LinkedHashSet<Constraint> constraints = Sets.newLinkedHashSet();
 		for (Cluster cluster : allClusters) {
-			for (Square cellA : cluster) {
-				for (Square cellB : cluster) {
-					if (!cellA.equals(cellB)) {
-						Constraint constraint = new InequalityConstraint(cellA, cellB);
+			for (Square squareA : cluster) {
+				for (Square squareB : cluster) {
+					if (!squareA.equals(squareB)) {
+						Constraint constraint = new InequalityConstraint(squareA, squareB);
 						if (constraints.add(constraint)) {
-							cellA.addConstraint(constraint);
-							cellB.addConstraint(constraint);
+							squareA.addConstraint(constraint);
+							squareB.addConstraint(constraint);
 						}
 					}
 				}
 			}
 		}
-//		allGroups.forEach(group -> constraints.add(new SinglePossibilityConstraint(group)));
 		return Lists.newArrayList(constraints);
 	}
 

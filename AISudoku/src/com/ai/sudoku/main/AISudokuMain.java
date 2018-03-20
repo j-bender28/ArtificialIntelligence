@@ -10,7 +10,7 @@ import com.ai.sudoku.exception.InvalidBoardException;
 
 public class AISudokuMain {
 	
-	private static final String TEST_FILE = "/boardA.sudoku";
+	private static final String TEST_FILE = "/board6A.sudoku";
 
 	public static void main(String[] args) throws Exception {		
 		ArcConsistancy acAnalyzer = new ArcConsistancy(createBoard());

@@ -1,10 +1,7 @@
 package com.ai.sudoku.board;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
-
-import org.eclipse.jdt.annotation.NonNull;
 
 import com.google.common.collect.Lists;
 
@@ -34,7 +31,7 @@ public class SudokuBoard {
 	public boolean isSolved() {
 		for (Cluster row : rows) {
 			for (Square cell : row) {
-				if (!cell.getValue().isPresent()) {
+				if (!cell.getBestGuess().isPresent()) {
 					return false;
 				}
 			}
@@ -44,7 +41,7 @@ public class SudokuBoard {
 
 	public void print() {
 		System.out.println();
-		for (Collection<@NonNull Square> row : rows) {
+		for (Cluster row : rows) {
 			for (Square cell : row) {
 				cell.print();
 				System.out.print("//");
