@@ -4,13 +4,14 @@ import java.io.IOException;
 
 import com.ai.sudoku.analysis.ArcConsistancy;
 import com.ai.sudoku.analysis.BacktrackingSearch;
+import com.ai.sudoku.analysis.GeneticAlgorithm;
 import com.ai.sudoku.board.SudokuBoard;
 import com.ai.sudoku.board.SudokuBoardBuilder;
 import com.ai.sudoku.exception.InvalidBoardException;
 
 public class AISudokuMain {
 	
-	private static final String TEST_FILE = "/board6A.sudoku";
+	private static final String TEST_FILE = "/board6ASolved.sudoku";
 
 	public static void main(String[] args) throws Exception {		
 		ArcConsistancy acAnalyzer = new ArcConsistancy(createBoard());
@@ -18,6 +19,9 @@ public class AISudokuMain {
 		
 		BacktrackingSearch search = new BacktrackingSearch(createBoard());
 		search.run();
+		
+		GeneticAlgorithm genAlg = new GeneticAlgorithm(createBoard());
+		genAlg.run();
 	}
 
 	private static SudokuBoard createBoard() throws IOException, InvalidBoardException {
