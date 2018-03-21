@@ -41,8 +41,8 @@ public class GeneticAlgorithm {
 		while (true) {
 			iterCount++;
 			if (minEvalNotExceededCount == 50) {
-				System.out.println(String.format("Genetic Algorithm Failed to Converge! Closest Eval Function: %s", bestEval));
-				break;
+				minEvalNotExceededCount = 0;
+				population = randomRestartPopulation(squares);
 			}
 			try {
 				double currentEval = runGeneticAlgorithm(population, squares);
@@ -54,11 +54,11 @@ public class GeneticAlgorithm {
 				}				
 			} catch (BoardSolvedException e) {
 				System.out.println("Genetic Algorithm Succeessfully Converged!");	
-				board.print();
 				break;
 			}
 		}
 		System.out.println(String.format("Genetic Algorithm Iterations: %s", iterCount));
+		board.print();
 	}
 
 	private List<int[]> randomRestartPopulation(List<@NonNull Square> squares) {
