@@ -13,9 +13,17 @@ import org.eclipse.jdt.annotation.NonNull;
 import com.ai.sudoku.board.Constraint;
 import com.ai.sudoku.board.Square;
 import com.ai.sudoku.board.SudokuBoard;
+import com.ai.sudoku.exception.BoardSolvedException;
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 
+/**
+ * Attempts to solve the input sudoku board using a genetic algorithm
+ * 
+ * @author Joe Bender
+ * @date Mar 20, 2018
+ */
 public class GeneticAlgorithm {
 
 	private static final int POPULATION_SIZE = 100;
@@ -28,28 +36,30 @@ public class GeneticAlgorithm {
 	public void run() {
 		List<@NonNull Square> squares = board.getRows().stream().flatMap(List::stream).collect(Collectors.toList());
 		List<int[]> population = randomRestartPopulation(squares);
-		double bestEval = 0;
-		int maxEvalNotExceededCount = 0;
+		double bestEval = 1;
+		int minEvalNotExceededCount = 0;
+		int iterCount = 0;
 		while (true) {
-			if (maxEvalNotExceededCount == 100) {
-				population = randomRestartPopulation(squares);
-				maxEvalNotExceededCount = 0;
+			iterCount++;
+			if (minEvalNotExceededCount == 50) {
+				System.out.println(String.format("Genetic Algorithm Failed to Converge! Closest Eval Function: %s", bestEval));
+				break;
 			}
 			try {
-				double currentEval = runGeneticAlgorithm(-1, population, squares);
-				if (currentEval > bestEval) {
-					System.out.println(String.format("Evaluation Improved, Was %s, is %s", bestEval, currentEval));
+				double currentEval = runGeneticAlgorithm(population, squares);
+				if (currentEval < bestEval) {
 					bestEval = currentEval;
-					maxEvalNotExceededCount = 0;
+					minEvalNotExceededCount = 0;
 				} else {
-					maxEvalNotExceededCount++;
-				}
+					minEvalNotExceededCount++;
+				}				
 			} catch (BoardSolvedException e) {
+				System.out.println("Genetic Algorithm Succeessfully Converged!");	
+				board.print();
 				break;
 			}
 		}
-		System.out.println("Genetic Algorithm Complete!");
-		board.print();
+		System.out.println(String.format("Genetic Algorithm Iterations: %s", iterCount));
 	}
 
 	private List<int[]> randomRestartPopulation(List<@NonNull Square> squares) {
@@ -58,12 +68,11 @@ public class GeneticAlgorithm {
 		return population;
 	}
 
-	private double runGeneticAlgorithm(double bestConvergence, List<int[]> population, List<@NonNull Square> squares)
+	private double runGeneticAlgorithm(List<int[]> population, List<@NonNull Square> squares)
 			throws BoardSolvedException {
 		ArrayListMultimap<Double, int[]> probValues = calculateProbValues(population, squares);
-		double maxEval = probValues.keySet().stream().max(Comparator.naturalOrder()).get();
-		List<int[][]> popPairs = determinePopulationPairs(probValues);
-		for (int[][] popPair : popPairs) {
+		double minEval = probValues.keySet().stream().min(Comparator.naturalOrder()).get();
+		for (int[][] popPair : determinePopulationPairs(probValues)) {
 			int[] boardA = popPair[0];
 			int[] boardB = popPair[1];
 			int partitionIndex = getRandomInt(0, boardA.length);			
@@ -79,14 +88,15 @@ public class GeneticAlgorithm {
 				}
 			}
 		}
-		return maxEval;
+		return minEval;
 	}
 	
 	private List<int[][]> determinePopulationPairs(ArrayListMultimap<Double, int[]> probValues) {
 		List<int[][]> popPairings = Lists.newArrayListWithCapacity(POPULATION_SIZE / 2);
-		while (popPairings.size() < 50) {
-			Optional<Entry<Double, int[]>> boardEntryA = probValues.entries().stream().skip(getRandomInt(0, probValues.entries().size())).findFirst();
-			Optional<Entry<Double, int[]>> boardEntryB = probValues.entries().stream().skip(getRandomInt(0, probValues.entries().size())).findFirst();			
+		while (popPairings.size() < POPULATION_SIZE / 2) {
+			int[] randInd = findTwoUniqueRandomIndeces(probValues.size());
+			Optional<Entry<Double, int[]>> boardEntryA = probValues.entries().stream().skip(randInd[0]).findFirst();
+			Optional<Entry<Double, int[]>> boardEntryB = probValues.entries().stream().skip(randInd[1]).findFirst();			
 			if (boardEntryA.isPresent() && boardEntryB.isPresent()
 					&& boardEntryA.get().getKey() * boardEntryB.get().getKey() < new Random().nextDouble()) {
 				double keyA = boardEntryA.get().getKey();
@@ -101,6 +111,16 @@ public class GeneticAlgorithm {
 		return popPairings;
 	}
 
+	private int[] findTwoUniqueRandomIndeces(int maxIndex) {
+		int[] indeces = new int[2];
+		while (indeces[0] == indeces[1]) {
+			for (int i = 0; i < 2; i++) {
+				indeces[i] = getRandomInt(0, maxIndex);
+			}
+		}
+		return indeces;
+	}
+
 	private ArrayListMultimap<Double, int[]> calculateProbValues(List<int[]> population, final List<@NonNull Square> squares) throws BoardSolvedException {
 		ArrayListMultimap<Double, int[]> probValues = ArrayListMultimap.create(population.size(), 10);
 		List<Constraint> constraints = board.getConstraints();
@@ -110,10 +130,7 @@ public class GeneticAlgorithm {
 			}
 			int violationCount = (int) constraints.stream().filter(Constraint::isViolated).count();
 			if (violationCount == 0) throw new BoardSolvedException();
-			double evalFunc = 1 - ((double) violationCount) / constraints.size();
-			if (evalFunc > 0.97) {
-//				board.print();
-			}
+			double evalFunc = ((double) violationCount) / constraints.size();
 			probValues.put(evalFunc, boardVals);
 		}
 		return probValues;
@@ -133,7 +150,7 @@ public class GeneticAlgorithm {
 		return boardVals;
 	}
 
-	private int getRandomInt(int low, int high) {
-		return new Random().ints(low, high).limit(1).findFirst().getAsInt();
+	private int getRandomInt(int min, int max) {
+		return new Random().ints(min, max + 1).limit(1).findFirst().getAsInt();
 	}
 }

@@ -43,8 +43,10 @@ public class Square {
 	}
 	
 	public void setBestGuess(int guess) {
-		this.bestGuess = Optional.of(guess);
-		possibilities.predicateProperty().set(val -> false);
+		if (!value.isPresent()) {
+			this.bestGuess = Optional.of(guess);
+			possibilities.predicateProperty().set(val -> false);
+		}
 	}
 
 	public void setValue(Integer value) {

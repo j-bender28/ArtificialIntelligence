@@ -1,7 +1,6 @@
 package com.ai.sudoku.analysis;
 
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.jdt.annotation.NonNull;
 
@@ -11,19 +10,24 @@ import com.ai.sudoku.board.SudokuBoard;
 import com.ai.sudoku.exception.InvalidBoardException;
 import com.google.common.collect.Lists;
 
+/**
+ * Attempts to solve the input sudoku board using arc consistancy
+ * 
+ * @author Joe Bender
+ * @date Mar 20, 2018
+ */
 public class ArcConsistancy {
 
 	private SudokuBoard board;
-	private List<Constraint> constraints;
+	private int constraintsProcessed = 0;
 
 	public ArcConsistancy(SudokuBoard board) {
 		this.board = board;
-		this.constraints = board.getConstraints();
 	}
 
 	public void run() throws InvalidBoardException {
 		maintainArcConsistancy(false);
-		do {
+		while (!board.isSolved() && board.containsUnsatisfiedConstraints()) {
 			for (Collection<@NonNull Square> row : board.getRows()) {
 				for (Square square : row) {
 					for (int guessVal : Lists.newArrayList(square.getPossibilities())) {
@@ -32,31 +36,29 @@ public class ArcConsistancy {
 					}
 				}
 			}
-		} while (!board.isSolved() && board.containsUnsatisfiedConstraints());
+		}
+		System.out.println("Arc Consistancy Successfully Converged!");
+		System.out.println(String.format("Constraints Processed: %s", constraintsProcessed));
+		board.print();
 	}
 
 	private void guessValue(Square square, int guessVal) throws InvalidBoardException {
-		System.out.println(String.format("Guessing: %s, %s", guessVal, square));
 		square.setBestGuess(guessVal);
 		try {
 			maintainArcConsistancy(true);			
 		} catch (InvalidBoardException e) {
-			System.out.println(" >> Impossible Board State!");
 			square.removePossibility(guessVal, false);
-			board.print();
 		}
 		square.resetGuess();
 	}
 
 	private void maintainArcConsistancy(boolean isGuess) throws InvalidBoardException {
 		while (board.containsUnsatisfiedConstraints()) {
-			for (Constraint constraint : constraints) {
+			for (Constraint constraint : board.getConstraints()) {
 				if (!constraint.isSatisfied()) {
-					if (constraint.invoke(isGuess)) {
-						System.out.println(String.format("Invoked %s, %s", constraint, isGuess ? "GUESS": "ACTUAL"));
-						board.print();
-					}
+					constraint.invoke(isGuess);
 					constraint.setSatisfied(true);
+					constraintsProcessed++;
 				}
 			}
 		}

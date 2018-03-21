@@ -14,14 +14,20 @@ public class AISudokuMain {
 	private static final String TEST_FILE = "/board6ASolved.sudoku";
 
 	public static void main(String[] args) throws Exception {		
+		System.out.println("Started Arc Consistency Analysis");
 		ArcConsistancy acAnalyzer = new ArcConsistancy(createBoard());
 		acAnalyzer.run();
+		System.out.println();
 		
+		System.out.println("Started Backtracking Search Analysis");
 		BacktrackingSearch search = new BacktrackingSearch(createBoard());
 		search.run();
+		System.out.println();
 		
+		System.out.println("Started Genetic Algorithm Analysis");
 		GeneticAlgorithm genAlg = new GeneticAlgorithm(createBoard());
 		genAlg.run();
+		System.out.println();
 	}
 
 	private static SudokuBoard createBoard() throws IOException, InvalidBoardException {

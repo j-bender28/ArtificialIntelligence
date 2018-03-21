@@ -10,9 +10,16 @@ import com.ai.sudoku.board.Constraint;
 import com.ai.sudoku.board.Square;
 import com.ai.sudoku.board.SudokuBoard;
 
+/**
+ * Attempts to solve the input sudoku board using a backtracking search tree
+ * 
+ * @author Joe Bender
+ * @date Mar 20, 2018
+ */
 public class BacktrackingSearch {
 
 	private SudokuBoard board;
+	private int nodesExplored = 0;
 
 	public BacktrackingSearch(SudokuBoard board) {
 		this.board = board;
@@ -21,6 +28,8 @@ public class BacktrackingSearch {
 	public void run() {
 		List<@NonNull Square> squares = board.getRows().stream().flatMap(List::stream).collect(Collectors.toList());
 		searchTreeForSolution(0, squares);
+		System.out.println("Backtracking Search Successfully Converged!");
+		System.out.println(String.format("Nodes Explored: %s", nodesExplored));
 		board.print();
 	}
 
@@ -31,11 +40,10 @@ public class BacktrackingSearch {
 			Optional<Integer> value = square.getValue();
 			for (int guess = 1; guess <= board.getDomain(); guess++) {
 				if (value.isPresent() && value.get() != guess) continue; //Don't make branch when square's domain is known
-				System.out.println(String.format("Guessing: %s, %s", guess, square));
+				nodesExplored++;
 				square.setBestGuess(guess);
-				board.getConstraints().forEach(c -> c.setSatisfied(true));				
+				board.getConstraints().forEach(c -> c.setSatisfied(true));			
 				if (square.getConstraints().stream().noneMatch(Constraint::isViolated)) {
-					board.print();
 					if (searchTreeForSolution(squareIndex + 1, squares)) {
 						return true;
 					}

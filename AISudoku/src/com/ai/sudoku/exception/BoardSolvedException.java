@@ -1,4 +1,4 @@
-package com.ai.sudoku.analysis;
+package com.ai.sudoku.exception;
 
 public class BoardSolvedException extends Exception {
 
