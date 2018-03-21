@@ -15,7 +15,6 @@ import com.ai.sudoku.board.Square;
 import com.ai.sudoku.board.SudokuBoard;
 import com.ai.sudoku.exception.BoardSolvedException;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.Lists;
 
 /**
