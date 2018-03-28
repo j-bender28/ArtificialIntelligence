@@ -109,8 +109,6 @@ public class GeneticAlgorithm {
 					&& boardEntryA.get().getKey() * boardEntryB.get().getKey() < threshold) {
 				int[] boardValsA = boardEntryA.get().getValue();
 				int[] boardValsB = boardEntryB.get().getValue();
-//				probValues.get(boardEntryA.get().getKey()).remove(boardValsA);
-//				probValues.get(boardEntryB.get().getKey()).remove(boardValsB);
 				popPairings.add(new int[][] {boardValsA, boardValsB});
 			}			
 		}		
