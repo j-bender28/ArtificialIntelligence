@@ -5,6 +5,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,7 +49,7 @@ public class SudokuBoardBuilder {
 		}
 		List<Cluster> allClusters = Stream.of(rows, cols, boxes).flatMap(Stream::of).collect(Collectors.toList());
 		ensureValidInputBoard(allClusters, size);
-		List<Constraint> constraints = extractConstraints(allClusters);
+		Set<Constraint> constraints = extractConstraints(allClusters);
 		return new SudokuBoard(rows, constraints);
 	}
 
@@ -69,7 +70,7 @@ public class SudokuBoardBuilder {
 		}
 	}
 
-	private List<Constraint> extractConstraints(List<Cluster> allClusters) {
+	private Set<Constraint> extractConstraints(List<Cluster> allClusters) {
 		LinkedHashSet<Constraint> constraints = Sets.newLinkedHashSet();
 		for (Cluster cluster : allClusters) {
 			for (Square squareA : cluster) {
@@ -84,7 +85,7 @@ public class SudokuBoardBuilder {
 				}
 			}
 		}
-		return Lists.newArrayList(constraints);
+		return constraints;
 	}
 
 	private List<Integer> createPossibilities(int size) {

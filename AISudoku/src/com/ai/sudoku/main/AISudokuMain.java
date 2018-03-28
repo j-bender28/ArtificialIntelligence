@@ -11,7 +11,7 @@ import com.ai.sudoku.exception.InvalidBoardException;
 
 public class AISudokuMain {
 	
-	private static final String TEST_FILE = "/board4A.sudoku";
+	private static final String TEST_FILE = "/board6A.sudoku";
 
 	public static void main(String[] args) throws Exception {		
 		System.out.println("Started Arc Consistency Analysis");

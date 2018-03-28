@@ -1,18 +1,21 @@
 package com.ai.sudoku.board;
 
+import java.util.Set;
+
 import org.eclipse.jdt.annotation.NonNull;
 
 import com.ai.sudoku.exception.InvalidBoardException;
+import com.google.common.collect.Sets;
 
 public abstract class Constraint {
 
 	public abstract boolean invoke(boolean isGuess) throws InvalidBoardException;
 	public abstract boolean isViolated();
 	private boolean satisfied;
-	protected @NonNull Square[] squares;
+	protected @NonNull Set<Square> squares;
 	
 	public Constraint(@NonNull Square ...squares) {
-		this.squares = squares;
+		this.squares = Sets.newHashSet(squares);
 	}
 
 	public boolean isSatisfied() {

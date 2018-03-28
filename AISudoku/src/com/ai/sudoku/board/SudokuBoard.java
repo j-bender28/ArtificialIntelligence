@@ -1,6 +1,7 @@
 package com.ai.sudoku.board;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
@@ -8,14 +9,14 @@ import com.google.common.collect.Lists;
 public class SudokuBoard {
 
 	private Cluster[] rows;
-	private List<Constraint> constraints;
+	private Set<Constraint> constraints;
 
-	public SudokuBoard(Cluster[] rows, List<Constraint> constraints) {
+	public SudokuBoard(Cluster[] rows, Set<Constraint> constraints) {
 		this.rows = rows;
 		this.constraints = constraints;
 	}
 
-	public List<Constraint> getConstraints() {
+	public Set<Constraint> getConstraints() {
 		return constraints;
 	}
 
