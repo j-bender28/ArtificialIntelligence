@@ -38,7 +38,7 @@ public class GeneticAlgorithm {
 	public void run() {
 		List<@NonNull Square> squares = board.getRows().stream().flatMap(List::stream).collect(Collectors.toList());
 		List<int[]> population = randomRestartPopulation(squares);
-		double bestEval = 1;
+		Entry<Double, int[]> bestEval = null;
 		int minEvalNotExceededCount = 0;
 		while (true) {
 			iterCount++;
@@ -48,12 +48,9 @@ public class GeneticAlgorithm {
 			}
 			try {
 				Entry<Double, int[]> currentEval = runGeneticAlgorithm(population, squares);
-				if (currentEval.getKey() < bestEval) {
-					bestEval = currentEval.getKey();
+				if (bestEval == null || currentEval.getKey() < bestEval.getKey()) {
+					bestEval = currentEval;
 					minEvalNotExceededCount = 0;
-					System.out.println(bestEval);
-					populateBoard(squares, currentEval.getValue());
-					board.print();
 				} else {
 					minEvalNotExceededCount++;
 				}				
@@ -62,7 +59,7 @@ public class GeneticAlgorithm {
 				break;
 			}
 		}
-		System.out.println(String.format("Genetic Algorithm Iterations: %s", iterCount));
+		System.out.println(String.format("Genetic Algorithm Iterations: %s", iterCount));		
 		board.print();
 	}
 
